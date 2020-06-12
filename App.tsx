@@ -2,12 +2,11 @@ import React, {useRef, useState} from 'react';
 import {SafeAreaView} from 'react-native';
 import {WebView} from 'react-native-webview';
 import {createStackNavigator} from '@react-navigation/stack';
-import {useIsFocused, NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 
 // webview screen
 const WebViewScreen = ({route, navigation}: any) => {
   const webViewRef = useRef<WebView>(null);
-  const isFocused = useIsFocused();
   const [isFirstLoading, setIsFirstLoading] = useState(true);
 
   return (
@@ -15,15 +14,15 @@ const WebViewScreen = ({route, navigation}: any) => {
       <WebView
         source={{uri: route?.params?.url || 'https://www.google.co.jp/'}}
         ref={webViewRef}
-        onLoadStart={({nativeEvent}) => {
-          if (isFirstLoading || !isFocused) {
-            return;
+        onShouldStartLoadWithRequest={({url}) => {
+          if (isFirstLoading) {
+            return true;
           }
-          navigation.push('WEB_VIEW', {url: nativeEvent.url});
+          navigation.push('WEB_VIEW', {url});
+          return false;
         }}
         onLoad={() => {
           setIsFirstLoading(false);
-          webViewRef?.current?.goBack();
         }}
       />
     </SafeAreaView>
